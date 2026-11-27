@@ -385,12 +385,21 @@
     var locShort = (c.locations || []).join("・") || locs.split("\n")[0];
     var transfer = [c.transfer, g("transferNote")].filter(Boolean).join("\n");
     var hasSalary = c.salary != null && c.salary !== "";
+    var salaryNum = hasSalary ? Number(c.salary) : NaN;
+    // 初任給は総支給で出す。マスタに基本給だけが入っている会社は、給与（詳細）の「月給」「初任給」の額を使う
+    (function(){
+      var t = g("salaryDetail").replace(/[０-９]/g, function(d){ return String.fromCharCode(d.charCodeAt(0) - 0xFEE0); });
+      function yen(re){ var m = t.match(re); return m ? Number(m[1].replace(/[,，]/g, "")) / 10000 : NaN; }
+      var base = yen(/基本給[^0-9]{0,8}([0-9][0-9,，]{4,})\s*円/);
+      var total = yen(/(?:月給|初任給)[^0-9]{0,8}([0-9][0-9,，]{4,})\s*円/);
+      if(isFinite(total) && isFinite(base) && total > base && (!isFinite(salaryNum) || Math.abs(salaryNum - base) < 0.1)){ salaryNum = total; hasSalary = true; }
+    })();
     var hasHol = c.holidays != null && c.holidays !== "";
     var holidayHead = hasHol ? ("年間休日" + c.holidays + "日" + (c.holidayType ? "（" + c.holidayType + "）" : "")) : (c.holidayType || "");
     return {
       name:name, industry:industry, jobTitle:g("jobTitle"),
       tags:[].concat(c.roles || []).concat(c.size ? [c.size] : []).filter(Boolean),
-      salary:hasSalary ? man(c.salary) : "", salaryNote:/固定残業|みなし残業/.test(g("salaryDetail")) ? "固定残業代を含みます（内訳は「給与・休日」へ）" : "",
+      salary:hasSalary ? man(Math.floor(salaryNum * 10) / 10) : "", salaryNote:/固定残業|みなし残業/.test(g("salaryDetail")) ? "固定残業代を含みます（内訳は「給与・休日」へ）" : "",
       holidays:hasHol ? String(c.holidays) : "", locShort:locShort, transfer:txt(c.transfer), headcount:g("headcount"), employmentType:g("employmentType"),
       g:g, locs:locs, transferAll:transfer, holidayAll:[holidayHead, g("holidaysDetail")].filter(Boolean).join("\n")
     };
@@ -479,7 +488,7 @@
     var facts = mk("div", "facts");
     if(m.salary){
       var big = mk("div", "fact big");
-      big.appendChild(mk("div", "fact-l", "初任給（月給）"));
+      big.appendChild(mk("div", "fact-l", "初任給（月給・総支給）"));
       var v = mk("div", "fact-v", m.salary); v.appendChild(mk("small", "", "万円")); big.appendChild(v);
       if(m.salaryNote) big.appendChild(mk("div", "fact-n", m.salaryNote));
       facts.appendChild(big);
@@ -530,7 +539,7 @@
 
     /* 給与・休日・待遇 */
     var s3 = section("pay", "給与・休日・待遇", "yen"); s3._tab = "給与・休日";
-    var d3 = dl([["初任給", m.salary ? m.salary + "万円" : ""], ["給与の内訳", g("salaryDetail"), "rich"], ["賞与", g("bonus")], ["昇給", g("raise")], ["就業時間", g("hours"), "rich"]]);
+    var d3 = dl([["初任給（総支給）", m.salary ? m.salary + "万円" : ""], ["給与の内訳", g("salaryDetail"), "rich"], ["賞与", g("bonus")], ["昇給", g("raise")], ["就業時間", g("hours"), "rich"]]);
     if(d3){ subT(s3, "給与・勤務時間"); s3.appendChild(d3); }
     if(m.holidayAll){ subT(s3, "休日・休暇"); s3.appendChild(rich(m.holidayAll, true)); }
     if(g("benefits")){ subT(s3, "福利厚生"); s3.appendChild(rich(g("benefits"), true)); }
