@@ -1,285 +1,663 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"></head><body style="margin:0">
-<title>求人票</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;700&family=Noto+Sans+JP:wght@400;500;700;800&display=swap">
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#ffffff">
+<title>求人票｜就活の名人</title>
 <style>
-  :root{ color-scheme:light; --pg-bg:#eef1f5; --pg-ink:#1d2430; --pg-sub:#5d6877; --pg-accent:#0f6b62; }
-  body{ background:var(--pg-bg); color:var(--pg-ink); font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif; }
-  .pg{ max-width:860px; margin:0 auto; padding-block:20px 40px; padding-inline:16px; }
-  .pg-note{ text-align:center; color:var(--pg-sub); font-size:13px; margin:18px 0 0; }
-  .pg-msg{ background:#fff; border:1px solid #e4e8ee; border-radius:14px; padding:44px 24px; text-align:center; }
-  .pg-msg h1{ margin:0 0 10px; font-family:"Shippori Mincho","Hiragino Mincho ProN",serif; font-size:22px; line-height:1.5; text-wrap:balance; }
-  .pg-msg p{ margin:0; color:var(--pg-sub); font-size:14px; line-height:1.9; }
-  .pg-foot{ margin-top:18px; text-align:center; font-size:12px; color:var(--pg-sub); letter-spacing:.08em; }
-  /* ---- 求人票（白ベース。ダークモードでも白地のまま表示する） ---- */
-  .jobsheet{
-    --js-ink:#1d2430; --js-sub:#5d6877; --js-rule:#e4e8ee; --js-soft:#f5f7fa; --js-accent:#0f6b62; --js-accent-soft:#e6f2ef;
-    background:#ffffff; color:var(--js-ink); color-scheme:light;
-    font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif; font-size:14.5px; line-height:1.85;
-    border:1px solid var(--js-rule); border-radius:14px; padding:28px 28px 22px; min-width:0;
+  /* 予約ページ（shukatsu-booking）と同じ書体・配色 */
+  :root{
+    color-scheme:light;
+    --bg:#f5f7f8; --card:#fff; --ink:#333a40; --sub:#6b7480; --mute:#a3abb4;
+    --teal:#20a39b; --teal-dark:#18867f; --teal-weak:#e7f5f4; --teal-line:#bfe4e1;
+    --line-c:#06c755; --border:#e2e6ea; --soft:#f7f9fa; --gold:#c98a12; --gold-weak:#fff6e2;
+    --radius:14px; --shadow:0 1px 6px rgba(30,50,60,.06);
+    --head-h:52px;
   }
-  .jobsheet *{box-sizing:border-box;}
-  .js-eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;color:var(--js-accent);}
-  .js-name{margin:4px 0 0;font-family:"Shippori Mincho","Hiragino Mincho ProN",serif;font-size:26px;line-height:1.4;font-weight:700;color:var(--js-ink);text-wrap:balance;overflow-wrap:anywhere;}
-  .js-industry{margin-top:4px;font-size:13px;color:var(--js-sub);}
-  .js-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;margin-top:18px;background:var(--js-rule);border:1px solid var(--js-rule);border-radius:10px;overflow:hidden;}
-  .js-fact{background:var(--js-soft);padding:10px 14px;min-width:0;}
-  .js-fact-l{font-size:11.5px;font-weight:700;color:var(--js-sub);}
-  .js-fact-v{font-size:14px;font-weight:700;color:var(--js-ink);line-height:1.5;overflow-wrap:anywhere;}
-  .js-sec{margin-top:30px;}
-  .js-sec-t{margin:0 0 6px;padding-bottom:8px;border-bottom:2px solid var(--js-ink);font-size:16px;font-weight:800;color:var(--js-ink);letter-spacing:.04em;}
-  .js-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:0 28px;}
-  .js-cell{padding:12px 0;border-bottom:1px solid var(--js-rule);min-width:0;}
-  .js-l{font-size:12px;font-weight:800;color:var(--js-accent);letter-spacing:.04em;margin-bottom:2px;}
-  .js-v{color:var(--js-ink);overflow-wrap:anywhere;}
-  .js-link{color:var(--js-accent);text-underline-offset:3px;}
-  .js-rich{display:flex;flex-direction:column;}
-  .js-gap{height:.7em;}
-  .js-head{font-weight:800;margin-top:.2em;}
-  .js-item{padding-left:1em;text-indent:-1em;}
-  .js-empty{margin:26px 0 8px;color:var(--js-sub);text-align:center;}
-  .js-foot{margin-top:28px;padding-top:12px;border-top:1px solid var(--js-rule);font-size:12px;color:var(--js-sub);}
-  @media (max-width:560px){
-    .jobsheet{padding:20px 16px 16px;border-radius:10px;font-size:14px;}
-    .js-name{font-size:22px;}
-    .js-grid{grid-template-columns:1fr;}
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans CJK JP","Yu Gothic UI",Meiryo,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.75;font-size:15px;font-weight:400;}
+  button{font:inherit;-webkit-tap-highlight-color:transparent;}
+  a{color:var(--teal-dark);}
+
+  /* ヘッダー */
+  .top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--border);}
+  .top-in{max-width:760px;margin:0 auto;height:var(--head-h);padding:0 16px;display:flex;align-items:center;gap:10px;}
+  .top img{width:30px;height:30px;border-radius:50%;flex:none;}
+  .top b{font-size:15px;color:var(--teal-dark);font-weight:700;letter-spacing:.02em;white-space:nowrap;}
+  .top .co{flex:1;min-width:0;font-size:13px;color:var(--sub);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;}
+  .top.scrolled .co{opacity:1;transform:none;}
+  .icon-btn{border:1px solid var(--border);background:#fff;border-radius:999px;height:34px;padding:0 12px;display:flex;align-items:center;gap:5px;color:var(--sub);font-size:12.5px;font-weight:700;cursor:pointer;flex:none;}
+  .icon-btn svg{width:15px;height:15px;}
+
+  /* 章のタブ */
+  .tabs{position:sticky;top:var(--head-h);z-index:19;background:rgba(245,247,248,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+  .tabs-in{max-width:760px;margin:0 auto;display:flex;gap:6px;overflow-x:auto;padding:8px 16px;scrollbar-width:none;}
+  .tabs-in::-webkit-scrollbar{display:none;}
+  .tabs a{flex:none;text-decoration:none;font-size:13px;font-weight:700;color:var(--sub);background:#fff;border:1px solid var(--border);border-radius:999px;padding:5px 13px;white-space:nowrap;transition:background .15s,color .15s,border-color .15s;}
+  .tabs a.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+
+  .wrap{max-width:760px;margin:0 auto;padding:16px 16px 0;}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 20px;margin-bottom:14px;}
+
+  /* ヒーロー */
+  .card.hero{padding:0;overflow:hidden;}
+  .hero-band{background:linear-gradient(135deg,#20a39b 0%,#2bb7a4 55%,#5cc9b5 100%);color:#fff;padding:22px 20px 20px;position:relative;}
+  .hero-band::after{content:"";position:absolute;right:-40px;top:-40px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.09);}
+  .eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.08em;background:rgba(255,255,255,.2);border-radius:999px;padding:2px 10px;}
+  .hero h1{margin:10px 0 4px;font-size:25px;line-height:1.4;font-weight:800;letter-spacing:.01em;text-wrap:balance;overflow-wrap:anywhere;position:relative;}
+  .hero .job{font-size:15px;font-weight:700;opacity:.95;position:relative;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;position:relative;}
+  .chip{font-size:12px;font-weight:700;border-radius:6px;padding:2px 9px;background:rgba(255,255,255,.95);color:var(--teal-dark);}
+  .hero-body{padding:18px 20px 20px;}
+  .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+  .fact{background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:10px 12px;min-width:0;}
+  .fact.big{grid-column:span 2;background:var(--teal-weak);border-color:var(--teal-line);display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .fact-l{font-size:11.5px;font-weight:700;color:var(--sub);}
+  .fact-v{font-size:16px;font-weight:800;line-height:1.45;overflow-wrap:anywhere;font-variant-numeric:tabular-nums;}
+  .fact-v small{font-size:12px;font-weight:700;margin-left:2px;color:var(--sub);}
+  .fact.big .fact-l{color:var(--teal-dark);font-size:12.5px;}
+  .fact.big .fact-v{font-size:30px;color:var(--teal-dark);letter-spacing:.01em;line-height:1.2;}
+  .fact.big .fact-v small{font-size:14px;color:var(--teal-dark);}
+  .fact.big .fact-n{font-size:12px;color:var(--sub);width:100%;line-height:1.5;margin-top:-2px;}
+  .updated{display:flex;align-items:center;gap:6px;margin-top:12px;font-size:12px;color:var(--mute);}
+  @media (min-width:600px){
+    .facts{grid-template-columns:repeat(4,minmax(0,1fr));}
+    .fact.big{grid-column:span 4;}
   }
 
+  /* 章 */
+  .sec{scroll-margin-top:calc(var(--head-h) + 58px);}
+  .sec-t{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-size:18px;font-weight:800;letter-spacing:.02em;}
+  .sec-t .ic{width:30px;height:30px;border-radius:9px;background:var(--teal-weak);color:var(--teal-dark);display:grid;place-items:center;flex:none;}
+  .sec-t .ic svg{width:17px;height:17px;}
+  .sub-t{font-size:13px;font-weight:800;color:var(--teal-dark);letter-spacing:.04em;margin:18px 0 6px;display:flex;align-items:center;gap:6px;}
+  .sub-t::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--teal);}
+  .sec .sub-t:first-of-type{margin-top:0;}
+
+  /* 名人のおすすめ（ハイライト） */
+  .pick{background:linear-gradient(180deg,#fffaf0,#fff);border:1.5px solid #f1d9a6;}
+  .pick .sec-t .ic{background:var(--gold-weak);color:var(--gold);}
+  .pick .sec-t small{font-size:11.5px;font-weight:700;color:var(--gold);background:var(--gold-weak);border-radius:999px;padding:1px 9px;}
+
+  /* 本文 */
+  .rich p{margin:0 0 .7em;}
+  .rich p:last-child{margin-bottom:0;}
+  .rich .lb{font-weight:800;font-size:13.5px;margin:.6em 0 .15em;}
+  .rich .lb:first-child{margin-top:0;}
+  .rich ul{list-style:none;margin:.2em 0 .7em;padding:0;}
+  .rich ul:last-child{margin-bottom:0;}
+  .rich li{position:relative;padding-left:18px;margin:.25em 0;}
+  .rich li::before{content:"";position:absolute;left:4px;top:.72em;width:6px;height:6px;border-radius:50%;background:var(--teal);}
+  .checks li{padding-left:24px;}
+  .checks li::before{left:3px;top:.55em;width:11px;height:6px;border-radius:0;background:none;border-left:2px solid var(--teal);border-bottom:2px solid var(--teal);transform:rotate(-45deg);}
+
+  /* 特徴カード */
+  .pts{display:grid;gap:10px;margin-top:4px;}
+  .pt{border:1px solid var(--border);border-radius:12px;padding:14px 14px 14px 14px;display:grid;grid-template-columns:30px 1fr;gap:4px 12px;background:#fff;}
+  .pt .no{grid-row:span 2;width:30px;height:30px;border-radius:50%;background:var(--teal);color:#fff;font-weight:800;font-size:14px;display:grid;place-items:center;font-variant-numeric:tabular-nums;}
+  .pick .pt .no{background:var(--gold);}
+  .pt h3{margin:3px 0 0;font-size:15.5px;line-height:1.5;font-weight:800;}
+  .pt .body{font-size:14px;color:#4a525a;line-height:1.8;}
+  .pt .body:empty{display:none;}
+  .intro{color:var(--sub);font-size:14px;margin:0 0 10px;}
+
+  /* 表（短い項目） */
+  .dl{margin:0;border-top:1px solid var(--border);}
+  .dl > div{display:grid;grid-template-columns:7.5em 1fr;gap:12px;padding:11px 2px;border-bottom:1px solid var(--border);}
+  .dl dt{font-size:13px;font-weight:700;color:var(--sub);}
+  .dl dd{margin:0;font-weight:600;overflow-wrap:anywhere;min-width:0;}
+  .dl dd .rich{font-weight:400;}
+  @media (max-width:420px){ .dl > div{grid-template-columns:6.2em 1fr;gap:10px;} }
+  @media (max-width:520px){ .dl > div.stack{grid-template-columns:1fr;gap:4px;} }
+
+  /* 選考フロー */
+  .flow{list-style:none;margin:2px 0 0;padding:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px 4px;counter-reset:st;}
+  .flow li{counter-increment:st;display:flex;align-items:center;gap:7px;background:var(--teal-weak);color:var(--teal-dark);border-radius:999px;padding:5px 13px 5px 5px;font-weight:800;font-size:14px;}
+  .flow li::before{content:counter(st);width:22px;height:22px;border-radius:50%;background:var(--teal);color:#fff;font-size:12px;display:grid;place-items:center;}
+  .flow li.goal{background:var(--teal);color:#fff;}
+  .flow li.goal::before{background:#fff;color:var(--teal);}
+  .flow .arr{color:var(--mute);font-size:13px;padding:0 1px;}
+
+  /* 勤務地チップ */
+  .places{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px;}
+  .places span{font-size:13px;font-weight:600;background:var(--soft);border:1px solid var(--border);border-radius:8px;padding:3px 10px;}
+  .places-head{font-weight:800;margin-bottom:6px;}
+
+  .note{font-size:12.5px;color:var(--sub);}
+
+  /* フッター */
+  .foot{text-align:center;padding:18px 0 8px;font-size:12px;color:var(--mute);line-height:1.8;}
+  .foot b{display:block;color:var(--teal-dark);font-size:13px;letter-spacing:.06em;}
+
+  /* 下部の相談ボタン */
+  body.has-cta{padding-bottom:calc(92px + env(safe-area-inset-bottom));}
+  .cta{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:10px 16px calc(10px + env(safe-area-inset-bottom));transform:translateY(110%);transition:transform .25s ease;}
+  .cta.show{transform:none;}
+  .cta-in{max-width:760px;margin:0 auto;}
+  .cta-q{font-size:12px;color:var(--sub);text-align:center;margin:0 0 7px;font-weight:600;}
+  .cta-row{display:flex;gap:8px;}
+  .cta button{flex:1;border:0;border-radius:12px;padding:12px 8px;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;}
+  .cta .go{background:var(--line-c);color:#fff;flex:1.4;box-shadow:0 2px 8px rgba(6,199,85,.25);}
+  .cta .ask{background:#fff;color:var(--ink);border:1.5px solid var(--border);}
+  .cta svg{width:19px;height:19px;flex:none;}
+
+  /* 送信の案内シート */
+  .sheet-bg{position:fixed;inset:0;z-index:40;background:rgba(20,30,40,.45);display:none;align-items:flex-end;justify-content:center;}
+  .sheet-bg.open{display:flex;}
+  .sheet{background:#fff;width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom));animation:up .22s ease;}
+  @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+  .sheet h2{margin:0 0 4px;font-size:17px;font-weight:800;}
+  .sheet p{margin:0 0 12px;font-size:13px;color:var(--sub);}
+  .sheet .msg{background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:12px 13px;font-size:14.5px;white-space:pre-wrap;margin-bottom:12px;}
+  .sheet .row{display:flex;gap:8px;}
+  .sheet .row button{flex:1;border-radius:12px;padding:12px 8px;font-weight:800;font-size:14.5px;cursor:pointer;}
+  .sheet .line{background:var(--line-c);color:#fff;border:0;}
+  .sheet .copy{background:#fff;border:1.5px solid var(--border);color:var(--ink);}
+  .sheet .close{display:block;margin:10px auto 0;border:0;background:none;color:var(--sub);font-size:13px;cursor:pointer;padding:6px 12px;}
+
+  .toast{position:fixed;left:50%;bottom:calc(110px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#333a40;color:#fff;font-size:13px;font-weight:700;border-radius:999px;padding:8px 16px;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none;}
+  .toast.show{opacity:1;}
+
+  /* 読み込み・準備中 */
+  .msgbox{text-align:center;padding:48px 24px;}
+  .msgbox .ic{width:52px;height:52px;border-radius:50%;background:var(--teal-weak);color:var(--teal-dark);display:grid;place-items:center;margin:0 auto 14px;}
+  .msgbox .ic svg{width:26px;height:26px;}
+  .msgbox h1{margin:0 0 8px;font-size:19px;font-weight:800;text-wrap:balance;}
+  .msgbox p{margin:0;color:var(--sub);font-size:14px;line-height:1.9;}
+  .skel{background:linear-gradient(90deg,#eef1f3 25%,#f6f8f9 50%,#eef1f3 75%);background-size:200% 100%;animation:sk 1.2s infinite;border-radius:8px;}
+  @keyframes sk{from{background-position:200% 0}to{background-position:-200% 0}}
+
+  @media (max-width:420px){
+    .hero h1{font-size:22px;}
+    .card{padding:20px 16px;}
+    .hero-band{padding:20px 16px 18px;}
+    .hero-body{padding:16px;}
+  }
+  @media print{
+    .top,.tabs,.cta,.sheet-bg{display:none!important;}
+    body{background:#fff;padding:0!important;}
+    .card{box-shadow:none;border:1px solid var(--border);break-inside:avoid-page;}
+  }
 </style>
-<main class="pg" id="pg"></main>
+</head>
+<body>
+<header class="top" id="top"><div class="top-in">
+  <img src="img/avatar.webp" alt="" width="30" height="30" onerror="this.src='img/avatar.jpg'">
+  <b>就活の名人</b>
+  <span class="co" id="topCo"></span>
+  <button class="icon-btn" id="shareBtn" type="button" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>共有
+  </button>
+</div></header>
+<nav class="tabs" id="tabs" hidden><div class="tabs-in" id="tabsIn"></div></nav>
+<main class="wrap" id="pg"></main>
+
+<div class="cta" id="cta" hidden><div class="cta-in">
+  <p class="cta-q">気になったら、担当アドバイザーにLINEで送るだけ</p>
+  <div class="cta-row">
+    <button class="ask" type="button" data-kind="ask">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>質問したい
+    </button>
+    <button class="go" type="button" data-kind="apply">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5s5.9-3.5 8.1-6C21.4 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8z"/></svg>選考を受けたい
+    </button>
+  </div>
+</div></div>
+
+<div class="sheet-bg" id="sheetBg" role="dialog" aria-modal="true" aria-labelledby="sheetT">
+  <div class="sheet">
+    <h2 id="sheetT">担当アドバイザーに送る</h2>
+    <p>LINEが開いたら、送り先に<b>「就活の名人」</b>を選んで送信してください。</p>
+    <div class="msg" id="sheetMsg"></div>
+    <div class="row">
+      <button class="copy" type="button" id="sheetCopy">文面をコピー</button>
+      <button class="line" type="button" id="sheetLine">LINEで送る</button>
+    </div>
+    <button class="close" type="button" id="sheetClose">閉じる</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
 <script>
 (function(){
   var JOBS = {};
   var JOBS_URL = "jobs.json";
-  /* ================= 求人票（共有部分） =================
-     企業マスタの入力画面（プレビュー）と、学生向けの公開ページの両方で同じコードを使う。
-     このブロックは build.py が両方のページへ埋め込む。 */
-  var JOB_SECTIONS = [
-    { id:"company",    title:"会社概要" },
-    { id:"selection",  title:"選考について" },
-    { id:"features",   title:"企業の特徴" },
-    { id:"recruit",    title:"募集要項" },
-    { id:"conditions", title:"給与・休日・待遇" },
-    { id:"people",     title:"求める人物像・応募条件" },
-    { id:"recommend",  title:"求人のお薦めポイント" },
-    { id:"results",    title:"採用実績" }
-  ];
-  // type: line=1行 / text=短い複数行 / long=長文　ai: AIで整えるときの文章の形（paragraphs=●見出し＋説明 / list=・の箇条書き / text=短い段落）
-  var JOB_FIELDS = [
-    { key:"corpName", label:"法人名", sec:"company", type:"line", ph:"例：株式会社〇〇（空欄なら企業名を使います）" },
-    { key:"hp", label:"企業HP", sec:"company", type:"url", ph:"https://…" },
-    { key:"zip", label:"郵便番号", sec:"company", type:"line", ph:"〒107-6013" },
-    { key:"address", label:"住所", sec:"company", type:"line", ph:"東京都港区赤坂1-12-32" },
-    { key:"station", label:"本社最寄り駅", sec:"company", type:"line", ph:"東京メトロ南北線：六本木一丁目駅" },
-    { key:"branches", label:"支店・営業所", sec:"company", type:"line", ph:"本社、大阪営業所、福岡営業所" },
-    { key:"employees", label:"従業員数", sec:"company", type:"line", ph:"212名" },
-    { key:"capital", label:"資本金", sec:"company", type:"line", ph:"5,000万円" },
-    { key:"sales", label:"売上", sec:"company", type:"line", ph:"47億円" },
-    { key:"industryText", label:"業種", sec:"company", type:"line", ph:"空欄なら上で選んだ業界を使います" },
-    { key:"businessContent", label:"事業内容", sec:"company", type:"text", ai:"text", ph:"例：求人広告事業／集客事業" },
+  /* 学生向けの公開ページ専用の表示。
+     データ（jobs.json）の形は、予約システムの企業マスタ（admin-hearing）が書き出すものと同じ。 */
 
-    { key:"flow", label:"選考フロー", sec:"selection", type:"text", ph:"例：一次面接 → SPI → 最終面接 → 内定" },
-    { key:"flowNote", label:"選考の補足", sec:"selection", type:"text", ph:"例：履歴書（顔写真付き）の提出あり" },
+  var ICONS = {
+    star:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>',
+    spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></svg>',
+    brief:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg>',
+    yen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l6 8 6-8"/><path d="M12 11v10"/><path d="M7 13h10M7 17h10"/></svg>',
+    steps:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M4 12h16M4 18h7"/><circle cx="18" cy="6" r="2"/><circle cx="15" cy="18" r="2"/></svg>',
+    person:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+    building:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1M10 21v-3h4v3"/></svg>',
+    chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+    clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>',
+    search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
+  };
 
-    { key:"features", label:"企業の特徴", sec:"features", type:"long", ai:"paragraphs", ph:"キックオフで聞いた会社の特徴をメモのまま書いてOK。「AIで整える」で学生向けの文章になります。" },
-
-    { key:"jobTitle", label:"募集職種", sec:"recruit", type:"line", ph:"例：法人営業職" },
-    { key:"employmentType", label:"雇用形態", sec:"recruit", type:"line", ph:"正社員" },
-    { key:"headcount", label:"採用数", sec:"recruit", type:"line", ph:"10人" },
-    { key:"duties", label:"仕事内容", sec:"recruit", type:"long", ai:"text", ph:"仕事の流れや担当範囲をメモのまま書いてOK" },
-    { key:"workplace", label:"勤務地", sec:"recruit", type:"text", ph:"空欄なら上で選んだ勤務地を使います。例：メイン 東京／千葉　他 名古屋／大阪" },
-    { key:"transferNote", label:"転勤の補足", sec:"recruit", type:"line", ph:"例：原則として転勤なし" },
-    { key:"probation", label:"試用期間", sec:"recruit", type:"line", ph:"例：3ヶ月（条件変更なし）" },
-
-    { key:"salaryDetail", label:"給与（詳細）", sec:"conditions", type:"long", ph:"例：186,400円（基本給）／固定残業代30時間分 49,080円を含む" },
-    { key:"bonus", label:"賞与", sec:"conditions", type:"text", ph:"例：年2回（6月・12月）" },
-    { key:"raise", label:"昇給", sec:"conditions", type:"text", ph:"例：年1回（4月）" },
-    { key:"hours", label:"就業時間", sec:"conditions", type:"text", ph:"例：9:00〜18:00" },
-    { key:"holidaysDetail", label:"休日休暇の詳細", sec:"conditions", type:"long", ai:"list", ph:"例：週休2日制（土日祝）、GW、夏季・年末年始休暇、有給休暇" },
-    { key:"benefits", label:"待遇・福利厚生", sec:"conditions", type:"long", ai:"list", ph:"例：各種社会保険完備、交通費支給、住宅手当、退職金制度" },
-    { key:"training", label:"教育制度", sec:"conditions", type:"long", ai:"text", ph:"例：入社時研修、OJT、資格取得支援" },
-
-    { key:"persona", label:"求める人物像", sec:"people", type:"long", ai:"list", ph:"例：人と関わることが好きな方" },
-    { key:"required", label:"必須条件", sec:"people", type:"long", ph:"例：2027年3月卒業見込みの方" },
-    { key:"otherReq", label:"その他応募条件", sec:"people", type:"long", ph:"例：浪人・留年は応募可、既卒は事前相談" },
-    { key:"preferred", label:"歓迎条件", sec:"people", type:"long", ai:"list", ph:"例：営業職に興味がある方" },
-
-    { key:"recommend", label:"求人のお薦めポイント", sec:"recommend", type:"long", ai:"paragraphs", ph:"学生におすすめしたい理由をメモのまま書いてOK" },
-
-    { key:"results", label:"採用実績", sec:"results", type:"long", ph:"例：過去の採用大学、人数、入社後の活躍など" }
-  ];
-  function jobText(v){ return v == null ? "" : String(v).replace(/\r\n?/g, "\n").trim(); }
-  function jobSafeUrl(u){
-    try{
-      var x = new URL(String(u == null ? "" : u).trim());
-      return (x.protocol === "https:" || x.protocol === "http:") ? x.href : "";
-    }catch(e){ return ""; }
+  function txt(v){ return v == null ? "" : String(v).replace(/\r\n?/g, "\n").trim(); }
+  function safeUrl(u){
+    try{ var x = new URL(String(u == null ? "" : u).trim()); return (x.protocol === "https:" || x.protocol === "http:") ? x.href : ""; }
+    catch(e){ return ""; }
   }
-
-  // 企業データ（マスタの項目＋求人票の項目）から、表示する章と行を組み立てる。空の項目は出さない。
-  function jobSheetModel(c){
-    var j = (c && c.job) || {};
-    function g(k){ return jobText(j[k]); }
-    var secs = [];
-    function row(label, value, kind){ return { label:label, value:jobText(value), kind:kind || "long" }; }
-    function sec(id, rows){
-      rows = rows.filter(function(r){ return r.value; });
-      if(!rows.length) return;
-      var def = JOB_SECTIONS.filter(function(s){ return s.id === id; })[0];
-      secs.push({ id:id, title:def.title, rows:rows });
-    }
-    var name = g("corpName") || jobText(c.name);
-    var industry = g("industryText") || (c.industries || []).join("・");
-    var locs = g("workplace") || (c.locations || []).join("／");
-    var transfer = [c.transfer, g("transferNote")].filter(Boolean).join("\n");
-    var salary = (c.salary != null && c.salary !== "") ? (c.salary + "万円") : "";
-    var holidayHead = (c.holidays != null && c.holidays !== "") ? ("年間休日" + c.holidays + "日" + (c.holidayType ? "（" + c.holidayType + "）" : "")) : (c.holidayType || "");
-    var holidays = [holidayHead, g("holidaysDetail")].filter(Boolean).join("\n");
-
-    sec("company", [
-      row("法人名", name, "short"), row("企業HP", g("hp"), "url"), row("郵便番号", g("zip"), "short"), row("住所", g("address"), "short"),
-      row("本社最寄り駅", g("station"), "short"), row("支店・営業所", g("branches"), "short"), row("従業員数", g("employees"), "short"),
-      row("資本金", g("capital"), "short"), row("売上", g("sales"), "short"), row("業種", industry, "short"), row("事業内容", g("businessContent"))
-    ]);
-    sec("selection", [ row("選考フロー", g("flow")), row("選考の補足", g("flowNote")) ]);
-    sec("features", [ row("企業の特徴", g("features")) ]);
-    sec("recruit", [
-      row("募集職種", g("jobTitle"), "short"), row("雇用形態", g("employmentType"), "short"), row("採用数", g("headcount"), "short"),
-      row("仕事内容", g("duties")), row("勤務地", locs), row("転勤", transfer), row("試用期間", g("probation"))
-    ]);
-    sec("conditions", [
-      row("初任給", salary, "short"), row("給与（詳細）", g("salaryDetail")), row("賞与", g("bonus")), row("昇給", g("raise")),
-      row("就業時間", g("hours")), row("休日休暇", holidays), row("待遇・福利厚生", g("benefits")), row("教育制度", g("training"))
-    ]);
-    sec("people", [
-      row("求める人物像", g("persona")), row("必須条件", g("required")), row("その他応募条件", g("otherReq")), row("歓迎条件", g("preferred"))
-    ]);
-    sec("recommend", [ row("求人のお薦めポイント", g("recommend")) ]);
-    sec("results", [ row("採用実績", g("results")) ]);
-
-    var facts = [];
-    function fact(label, v){ if(jobText(v)) facts.push({ label:label, value:jobText(v) }); }
-    fact("募集職種", g("jobTitle"));
-    fact("勤務地", locs);
-    fact("初任給", salary);
-    fact("年間休日", (c.holidays != null && c.holidays !== "") ? (c.holidays + "日") : "");
-    fact("転勤", c.transfer);
-    return { name:name, industry:industry, facts:facts, sections:secs };
-  }
-
-  function jobMk(tag, cls, text){
+  function mk(tag, cls, text){
     var e = document.createElement(tag);
     if(cls) e.className = cls;
     if(text != null) e.textContent = text;
     return e;
   }
-  // 本文：●・■で始まる行は見出し、・で始まる行は箇条書き、空行は段落の区切りとして整える
-  function jobRich(value){
-    var box = jobMk("div", "js-rich");
+  function icon(name){ var s = mk("span", "ic"); s.innerHTML = ICONS[name] || ""; return s; }
+  function man(v){ // 23.5 → "23.5"
+    var n = Number(v); if(!isFinite(n)) return String(v);
+    return (Math.round(n * 10) / 10).toLocaleString("ja-JP");
+  }
+
+  /* ---------- 本文の整形 ----------
+     ●■◆①〜⑳ で始まる行＝見出し、【】だけの行＝小見出し、・•- で始まる行＝箇条書き、空行＝段落の区切り */
+  var HEAD_RE = /^\s*(?:[●■◆▼◎]|[①-⑳]|[0-9０-９]{1,2}[\.．\)）])\s*/;
+  var NUM_RE  = /^\s*([①-⑳]|[0-9０-９]{1,2})/;
+  var ITEM_RE = /^\s*[・･\-－•‐◦]\s*/;
+  var LABEL_RE = /^\s*【([^】]+)】\s*$/;
+  function parseLines(value){
+    var out = [];
     String(value).split("\n").forEach(function(line){
       var t = line.replace(/\s+$/, "");
-      if(!t.trim()){ box.appendChild(jobMk("div", "js-gap")); return; }
-      var cls = "js-line";
-      if(/^\s*[●■◆▼◎]/.test(t)) cls += " js-head";
-      else if(/^\s*[・･\-－•]/.test(t)) cls += " js-item";
-      box.appendChild(jobMk("div", cls, t.trim()));
+      if(!t.trim()){ out.push({ t:"gap" }); return; }
+      var m;
+      if((m = t.match(LABEL_RE))) out.push({ t:"label", s:m[1].trim() });
+      else if(HEAD_RE.test(t)){
+        var nm = t.match(NUM_RE), num = "";
+        if(nm){ var ch = nm[1]; num = /[①-⑳]/.test(ch) ? String(ch.charCodeAt(0) - 0x245F) : ch.replace(/[０-９]/g, function(d){ return String.fromCharCode(d.charCodeAt(0) - 0xFEE0); }); }
+        out.push({ t:"head", s:t.replace(HEAD_RE, "").trim(), n:num });
+      }
+      else if(ITEM_RE.test(t)) out.push({ t:"item", s:t.replace(ITEM_RE, "").trim() });
+      else out.push({ t:"p", s:t.trim() });
+    });
+    return out;
+  }
+  function richFrom(lines, checks){
+    var box = mk("div", "rich"), ul = null, p = null;
+    lines.forEach(function(l){
+      if(l.t === "item"){ p = null; if(!ul){ ul = mk("ul", checks ? "checks" : ""); box.appendChild(ul); } ul.appendChild(mk("li", "", l.s)); return; }
+      ul = null;
+      if(l.t === "gap"){ p = null; return; }
+      if(l.t === "label" || l.t === "head"){ p = null; box.appendChild(mk("div", "lb", l.s)); return; }
+      if(p){ p.appendChild(document.createElement("br")); p.appendChild(document.createTextNode(l.s)); }
+      else { p = mk("p", "", l.s); box.appendChild(p); }
     });
     return box;
   }
-  function renderJobSheet(c, opts){
-    opts = opts || {};
-    var m = jobSheetModel(c);
-    var root = jobMk("article", "jobsheet");
-    var head = jobMk("header", "js-top");
-    head.appendChild(jobMk("div", "js-eyebrow", "求人票"));
-    head.appendChild(jobMk("h1", "js-name", m.name || "（企業名を入力してください）"));
-    if(m.industry) head.appendChild(jobMk("div", "js-industry", m.industry));
-    if(m.facts.length){
-      var fg = jobMk("div", "js-facts");
-      m.facts.forEach(function(f){
-        var cell = jobMk("div", "js-fact");
-        cell.appendChild(jobMk("div", "js-fact-l", f.label));
-        cell.appendChild(jobMk("div", "js-fact-v", f.value));
-        fg.appendChild(cell);
-      });
-      head.appendChild(fg);
-    }
-    root.appendChild(head);
-
-    if(!m.sections.length){
-      root.appendChild(jobMk("p", "js-empty", "左の入力欄に内容を入れると、ここに求人票が表示されます。"));
-    }
-    m.sections.forEach(function(s){
-      var sec = jobMk("section", "js-sec");
-      sec.appendChild(jobMk("h2", "js-sec-t", s.title));
-      var shorts = s.rows.filter(function(r){ return r.kind === "short" || r.kind === "url"; });
-      var longs = s.rows.filter(function(r){ return !(r.kind === "short" || r.kind === "url"); });
-      function cellFor(r){
-        var cell = jobMk("div", "js-cell");
-        if(!(s.rows.length === 1 && r.label === s.title)) cell.appendChild(jobMk("div", "js-l", r.label));
-        var v = jobMk("div", "js-v");
-        if(r.kind === "url" && jobSafeUrl(r.value)){
-          var a = jobMk("a", "js-link", r.value);
-          a.href = jobSafeUrl(r.value); a.target = "_blank"; a.rel = "noopener noreferrer";
-          v.appendChild(a);
-        } else if(r.kind === "short"){
-          v.textContent = r.value;
-        } else {
-          v.appendChild(jobRich(r.value));
-        }
-        cell.appendChild(v);
-        return cell;
+  function rich(value, checks){
+    var lines = parseLines(value);
+    // 箇条書き向きの欄（休日・福利厚生など）で、短い行が並んでいるだけなら1行ずつチェック付きにする
+    if(checks){
+      var body = lines.filter(function(l){ return l.t !== "gap"; });
+      if(body.length >= 2 && body.every(function(l){ return l.t !== "head" && l.s.length <= 60; })){
+        lines = lines.map(function(l){ return l.t === "p" ? { t:"item", s:l.s } : l; });
       }
-      if(shorts.length){
-        var grid = jobMk("div", "js-grid");
-        shorts.forEach(function(r){ grid.appendChild(cellFor(r)); });
-        sec.appendChild(grid);
-      }
-      longs.forEach(function(r){ var c2 = cellFor(r); c2.classList.add("js-cell-long"); sec.appendChild(c2); });
-      root.appendChild(sec);
+    }
+    return richFrom(lines, checks);
+  }
+  // 見出しが2つ以上ある文章は、番号付きのカードに分ける
+  function points(value){
+    var lines = parseLines(value);
+    var heads = lines.filter(function(l){ return l.t === "head"; });
+    if(heads.length < 2) return rich(value);
+    var wrap = mk("div"), intro = [], cards = [], cur = null;
+    lines.forEach(function(l){
+      if(l.t === "head"){ cur = { h:l, body:[] }; cards.push(cur); return; }
+      if(cur) cur.body.push(l); else intro.push(l);
     });
-    if(opts.updatedAt){
-      var d = new Date(opts.updatedAt);
-      if(!isNaN(d)) root.appendChild(jobMk("footer", "js-foot", "この求人票は " + d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日 時点の内容です。内容は変更になる場合があります。"));
+    var introText = intro.filter(function(l){ return l.t !== "gap"; });
+    // 「当社の特徴・魅力」のような1行だけの前置きは、章の見出しと重なるので出さない
+    if(introText.length > 1 || (introText.length === 1 && introText[0].s.length > 20)){
+      var ib = richFrom(intro); ib.classList.add("intro"); wrap.appendChild(ib);
     }
-    return root;
+    var grid = mk("div", "pts");
+    cards.forEach(function(c, i){
+      var pt = mk("div", "pt");
+      pt.appendChild(mk("div", "no", c.h.n || String(i + 1)));
+      pt.appendChild(mk("h3", "", c.h.s));
+      var b = mk("div", "body");
+      if(c.body.some(function(l){ return l.t !== "gap"; })) b.appendChild(richFrom(c.body));
+      pt.appendChild(b);
+      grid.appendChild(pt);
+    });
+    wrap.appendChild(grid);
+    return wrap;
+  }
+  function flowView(value){
+    var lines = value.split("\n");
+    var first = lines[0];
+    var steps = first.split(/\s*(?:→|⇒|➡|->|＞|>|▶|▷)\s*/).map(function(s){ return s.trim(); }).filter(Boolean);
+    if(steps.length < 2) return rich(value);
+    var wrap = mk("div");
+    var ol = mk("ol", "flow");
+    steps.forEach(function(s, i){
+      if(i){ var a = mk("span", "arr", "›"); a.setAttribute("aria-hidden", "true"); ol.appendChild(a); }
+      ol.appendChild(mk("li", /内定/.test(s) && i === steps.length - 1 ? "goal" : "", s));
+    });
+    wrap.appendChild(ol);
+    var rest = lines.slice(1).join("\n").trim();
+    if(rest){ var r = rich(rest); r.style.marginTop = "10px"; wrap.appendChild(r); }
+    return wrap;
+  }
+  function placesView(value){
+    var lines = value.split("\n").map(function(s){ return s.trim(); }).filter(Boolean);
+    if(lines.length < 3) return rich(value);
+    var wrap = mk("div");
+    var rest = lines;
+    // 1行目が「東京、神奈川」のような都道府県のまとめなら見出しとして出す
+    if(/[、,／\/]/.test(lines[0]) || lines[0].length <= 10){ wrap.appendChild(mk("div", "places-head", lines[0])); rest = lines.slice(1); }
+    var box = mk("div", "places");
+    rest.forEach(function(s){ box.appendChild(mk("span", "", s.replace(ITEM_RE, ""))); });
+    wrap.appendChild(box);
+    return wrap;
   }
 
-  var host = document.getElementById("pg");
-  function msg(title, text){
-    host.innerHTML = "";
-    var m = jobMk("div", "pg-msg");
-    m.appendChild(jobMk("h1", "", title));
-    m.appendChild(jobMk("p", "", text));
-    host.appendChild(m);
-    document.title = "求人票";
+  /* ---------- データ → 表示モデル ---------- */
+  function model(c){
+    var j = (c && c.job) || {};
+    function g(k){ return txt(j[k]); }
+    var name = g("corpName") || txt(c.name);
+    var industry = g("industryText") || (c.industries || []).join("・");
+    var locs = g("workplace") || (c.locations || []).join("／");
+    var locShort = (c.locations || []).join("・") || locs.split("\n")[0];
+    var transfer = [c.transfer, g("transferNote")].filter(Boolean).join("\n");
+    var hasSalary = c.salary != null && c.salary !== "";
+    var hasHol = c.holidays != null && c.holidays !== "";
+    var holidayHead = hasHol ? ("年間休日" + c.holidays + "日" + (c.holidayType ? "（" + c.holidayType + "）" : "")) : (c.holidayType || "");
+    return {
+      name:name, industry:industry, jobTitle:g("jobTitle"),
+      tags:[].concat(c.roles || []).concat(c.size ? [c.size] : []).filter(Boolean),
+      salary:hasSalary ? man(c.salary) : "", salaryNote:/固定残業|みなし残業/.test(g("salaryDetail")) ? "固定残業代を含みます（内訳は「給与・休日」へ）" : "",
+      holidays:hasHol ? String(c.holidays) : "", locShort:locShort, transfer:txt(c.transfer), headcount:g("headcount"), employmentType:g("employmentType"),
+      g:g, locs:locs, transferAll:transfer, holidayAll:[holidayHead, g("holidaysDetail")].filter(Boolean).join("\n")
+    };
   }
+
+  /* ---------- 画面 ---------- */
+  var host = document.getElementById("pg");
+  var tabs = document.getElementById("tabs"), tabsIn = document.getElementById("tabsIn");
+  var cta = document.getElementById("cta");
+  var current = null;
+
+  function msg(iconName, title, text, skeleton){
+    host.innerHTML = ""; tabs.hidden = true; cta.hidden = true; document.body.classList.remove("has-cta");
+    var card = mk("div", "card msgbox");
+    if(skeleton){
+      ["60%", "85%", "40%"].forEach(function(w, i){ var s = mk("div", "skel"); s.style.cssText = "height:" + (i ? 14 : 26) + "px;width:" + w + ";margin:" + (i ? "12px" : "0") + " auto 0;"; card.appendChild(s); });
+    } else {
+      card.appendChild(icon(iconName));
+      card.appendChild(mk("h1", "", title));
+      card.appendChild(mk("p", "", text));
+    }
+    host.appendChild(card);
+    document.title = "求人票｜就活の名人";
+  }
+
+  function section(id, title, iconName, extraCls){
+    var s = mk("section", "card sec" + (extraCls ? " " + extraCls : ""));
+    s.id = id;
+    var h = mk("h2", "sec-t"); h.appendChild(icon(iconName)); h.appendChild(document.createTextNode(title));
+    s.appendChild(h);
+    s._tab = title;
+    return s;
+  }
+  function subT(sec, label){ sec.appendChild(mk("div", "sub-t", label)); }
+  function dl(rows){
+    rows = rows.filter(function(r){ return r[1]; });
+    if(!rows.length) return null;
+    var d = mk("dl", "dl");
+    rows.forEach(function(r){
+      var isRich = r[1].indexOf("\n") >= 0 || r[2] === "rich";
+      var row = mk("div", isRich && r[1].length > 60 ? "stack" : ""); row.appendChild(mk("dt", "", r[0]));
+      var dd = mk("dd");
+      if(r[2] === "url" && safeUrl(r[1])){
+        var a = mk("a", "", r[1].replace(/^https?:\/\//, "").replace(/\/$/, "")); a.href = safeUrl(r[1]); a.target = "_blank"; a.rel = "noopener noreferrer";
+        dd.appendChild(a);
+      } else if(r[1].indexOf("\n") >= 0 || r[2] === "rich"){ dd.appendChild(rich(r[1])); }
+      else dd.textContent = r[1];
+      row.appendChild(dd); d.appendChild(row);
+    });
+    return d;
+  }
+
+  function render(c){
+    var m = model(c), g = m.g, secs = [];
+    host.innerHTML = "";
+    sheetBg.classList.remove("open");
+
+    /* ヒーロー */
+    var hero = mk("section", "card hero");
+    var band = mk("div", "hero-band");
+    var eb = mk("span", "eyebrow"); eb.innerHTML = ICONS.star.replace("<svg", '<svg width="12" height="12"'); eb.appendChild(document.createTextNode("就活の名人 紹介求人"));
+    band.appendChild(eb);
+    band.appendChild(mk("h1", "", m.name));
+    if(m.jobTitle) band.appendChild(mk("div", "job", m.jobTitle + (m.employmentType ? "（" + m.employmentType + "）" : "")));
+    var chips = mk("div", "chips");
+    [m.industry].concat(m.tags).filter(Boolean).forEach(function(t){ chips.appendChild(mk("span", "chip", t)); });
+    if(chips.childNodes.length) band.appendChild(chips);
+    hero.appendChild(band);
+
+    var body = mk("div", "hero-body");
+    var facts = mk("div", "facts");
+    if(m.salary){
+      var big = mk("div", "fact big");
+      big.appendChild(mk("div", "fact-l", "初任給（月給）"));
+      var v = mk("div", "fact-v", m.salary); v.appendChild(mk("small", "", "万円")); big.appendChild(v);
+      if(m.salaryNote) big.appendChild(mk("div", "fact-n", m.salaryNote));
+      facts.appendChild(big);
+    }
+    function fact(label, value, unit){
+      if(!value) return;
+      var f = mk("div", "fact"); f.appendChild(mk("div", "fact-l", label));
+      var fv = mk("div", "fact-v", value); if(unit) fv.appendChild(mk("small", "", unit)); f.appendChild(fv);
+      facts.appendChild(f);
+    }
+    fact("年間休日", m.holidays, "日");
+    fact("勤務地", m.locShort);
+    fact("転勤", m.transfer);
+    fact("採用予定", m.headcount);
+    if(facts.childNodes.length) body.appendChild(facts);
+    if(c.jobUpdatedAt){
+      var d = new Date(c.jobUpdatedAt);
+      if(!isNaN(d)){
+        var up = mk("div", "updated"); up.innerHTML = ICONS.clock.replace("<svg", '<svg width="13" height="13"');
+        up.appendChild(document.createTextNode(d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日 時点の情報です"));
+        body.appendChild(up);
+      }
+    }
+    hero.appendChild(body);
+    host.appendChild(hero);
+
+    /* 名人のおすすめ */
+    if(g("recommend")){
+      var s0 = section("pick", "名人のおすすめポイント", "star", "pick");
+      s0._tab = "おすすめ";
+      s0.appendChild(points(g("recommend")));
+      secs.push(s0);
+    }
+    /* 企業の特徴 */
+    if(g("features")){
+      var s1 = section("features", "企業の特徴", "spark");
+      s1._tab = "特徴";
+      s1.appendChild(points(g("features")));
+      secs.push(s1);
+    }
+    /* 仕事内容・募集要項 */
+    var s2 = section("work", "仕事内容・募集要項", "brief"); s2._tab = "仕事内容";
+    if(g("duties")){ subT(s2, "仕事内容"); s2.appendChild(points(g("duties"))); }
+    if(m.locs){ subT(s2, "勤務地"); s2.appendChild(placesView(m.locs)); }
+    var d2 = dl([["募集職種", m.jobTitle], ["雇用形態", m.employmentType], ["採用予定数", m.headcount], ["転勤", m.transferAll], ["試用期間", g("probation")]]);
+    if(d2){ subT(s2, "募集要項"); s2.appendChild(d2); }
+    if(s2.childNodes.length > 1) secs.push(s2);
+
+    /* 給与・休日・待遇 */
+    var s3 = section("pay", "給与・休日・待遇", "yen"); s3._tab = "給与・休日";
+    var d3 = dl([["初任給", m.salary ? m.salary + "万円" : ""], ["給与の内訳", g("salaryDetail"), "rich"], ["賞与", g("bonus")], ["昇給", g("raise")], ["就業時間", g("hours"), "rich"]]);
+    if(d3){ subT(s3, "給与・勤務時間"); s3.appendChild(d3); }
+    if(m.holidayAll){ subT(s3, "休日・休暇"); s3.appendChild(rich(m.holidayAll, true)); }
+    if(g("benefits")){ subT(s3, "福利厚生"); s3.appendChild(rich(g("benefits"), true)); }
+    if(g("training")){ subT(s3, "研修・教育制度"); s3.appendChild(rich(g("training"), true)); }
+    if(s3.childNodes.length > 1) secs.push(s3);
+
+    /* 選考 */
+    if(g("flow") || g("flowNote")){
+      var s4 = section("select", "選考の流れ", "steps"); s4._tab = "選考";
+      if(g("flow")) s4.appendChild(flowView(g("flow")));
+      if(g("flowNote")){ subT(s4, "提出物・補足"); s4.appendChild(rich(g("flowNote"))); }
+      secs.push(s4);
+    }
+    /* 求める人物像 */
+    var s5 = section("people", "求める人物像・応募条件", "person"); s5._tab = "人物像";
+    if(g("persona")){ subT(s5, "求める人物像"); s5.appendChild(rich(g("persona"), true)); }
+    if(g("required")){ subT(s5, "必須条件"); s5.appendChild(rich(g("required"))); }
+    if(g("otherReq")){ subT(s5, "その他の応募条件"); s5.appendChild(rich(g("otherReq"))); }
+    if(g("preferred")){ subT(s5, "歓迎条件"); s5.appendChild(rich(g("preferred"), true)); }
+    if(s5.childNodes.length > 1) secs.push(s5);
+
+    /* 採用実績 */
+    if(g("results")){
+      var s6 = section("results", "採用実績", "chart"); s6._tab = "採用実績";
+      s6.appendChild(rich(g("results")));
+      secs.push(s6);
+    }
+    /* 会社概要 */
+    var s7 = section("company", "会社概要", "building"); s7._tab = "会社概要";
+    var addr = [g("zip") ? "〒" + g("zip").replace(/^〒/, "") : "", g("address")].filter(Boolean).join(" ");
+    var d7 = dl([["法人名", m.name], ["業種", m.industry], ["事業内容", g("businessContent"), "rich"], ["所在地", addr], ["最寄り駅", g("station")], ["拠点", g("branches")],
+      ["従業員数", g("employees")], ["資本金", g("capital")], ["売上高", g("sales")], ["ホームページ", g("hp"), "url"]]);
+    if(d7){ s7.appendChild(d7); secs.push(s7); }
+
+    secs.forEach(function(s){ host.appendChild(s); });
+    var foot = mk("footer", "foot");
+    foot.appendChild(mk("b", "", "就活の名人"));
+    foot.appendChild(document.createTextNode("掲載内容は変更になる場合があります。最新の情報は担当アドバイザーにご確認ください。"));
+    host.appendChild(foot);
+
+    /* タブ */
+    tabsIn.innerHTML = "";
+    secs.forEach(function(s){
+      var a = mk("a", "", s._tab); a.href = "#" + s.id; a.dataset.id = s.id;
+      a.addEventListener("click", function(e){ e.preventDefault(); s.scrollIntoView({ behavior:"smooth", block:"start" }); });
+      tabsIn.appendChild(a);
+    });
+    tabs.hidden = secs.length < 2;
+    watchSections(secs);
+
+    document.getElementById("topCo").textContent = m.name;
+    document.title = m.name + (m.jobTitle ? "｜" + m.jobTitle : "") + "｜就活の名人";
+    current = m;
+    cta.hidden = false; document.body.classList.add("has-cta");
+    window.scrollTo(0, 0);
+  }
+
+  /* スクロールに合わせてタブを光らせる */
+  var io = null;
+  function watchSections(secs){
+    if(io) io.disconnect();
+    if(!("IntersectionObserver" in window)) return;
+    var vis = {};
+    io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ vis[e.target.id] = e.isIntersecting; });
+      var id = null;
+      for(var i = 0; i < secs.length; i++){ if(vis[secs[i].id]){ id = secs[i].id; break; } }
+      if(!id) return;
+      Array.prototype.forEach.call(tabsIn.children, function(a){
+        var on = a.dataset.id === id;
+        if(on && !a.classList.contains("on")) a.scrollIntoView({ inline:"center", block:"nearest", behavior:"smooth" });
+        a.classList.toggle("on", on);
+      });
+    }, { rootMargin:"-120px 0px -55% 0px" });
+    secs.forEach(function(s){ io.observe(s); });
+  }
+
+  /* ヘッダーに社名、下部ボタンの出し入れ */
+  var topEl = document.getElementById("top");
+  function onScroll(){
+    var y = window.scrollY || 0;
+    topEl.classList.toggle("scrolled", y > 140);
+    cta.classList.toggle("show", y > 60 || document.documentElement.scrollHeight <= window.innerHeight + 80);
+  }
+  window.addEventListener("scroll", onScroll, { passive:true });
+
+  /* LINEで送る */
+  var sheetBg = document.getElementById("sheetBg"), sheetMsg = document.getElementById("sheetMsg"), toastEl = document.getElementById("toast");
+  function toast(t){ toastEl.textContent = t; toastEl.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(function(){ toastEl.classList.remove("show"); }, 1800); }
+  function message(kind){
+    var n = current.name + (current.jobTitle ? "（" + current.jobTitle + "）" : "");
+    return kind === "apply"
+      ? "求人票を見ました。\n" + n + " の選考を受けたいです。"
+      : "求人票を見ました。\n" + n + " について質問があります。\n\n質問：";
+  }
+  Array.prototype.forEach.call(cta.querySelectorAll("button"), function(b){
+    b.addEventListener("click", function(){
+      if(!current) return;
+      sheetMsg.textContent = message(b.dataset.kind);
+      sheetBg.classList.add("open");
+    });
+  });
+  document.getElementById("sheetClose").addEventListener("click", function(){ sheetBg.classList.remove("open"); });
+  sheetBg.addEventListener("click", function(e){ if(e.target === sheetBg) sheetBg.classList.remove("open"); });
+  function copy(t){
+    if(navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t);
+    var ta = mk("textarea"); ta.value = t; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); }catch(e){}
+    ta.remove(); return Promise.resolve();
+  }
+  document.getElementById("sheetCopy").addEventListener("click", function(){
+    copy(sheetMsg.textContent).then(function(){ toast("コピーしました"); }, function(){ toast("コピーできませんでした"); });
+  });
+  document.getElementById("sheetLine").addEventListener("click", function(){
+    var t = sheetMsg.textContent;
+    copy(t).catch(function(){});
+    location.href = "https://line.me/R/msg/text/?" + encodeURIComponent(t);
+  });
+
+  /* 共有 */
+  var shareBtn = document.getElementById("shareBtn");
+  if(navigator.share){
+    shareBtn.hidden = false;
+    shareBtn.addEventListener("click", function(){
+      navigator.share({ title:document.title, url:location.href }).catch(function(){});
+    });
+  }
+
+  /* 読み込み */
   function show(){
     var id = "";
     try{ id = decodeURIComponent(String(location.hash || "").replace(/^#/, "")); }catch(e){ id = ""; }
-    if(!id){ msg("求人票のURLをご確認ください", "担当者からお送りしたURLを、そのままの形でお開きください。"); return; }
+    if(!id){ msg("search", "求人票のURLをご確認ください", "担当者からお送りしたURLを、そのままの形でお開きください。"); return; }
     var c = Object.prototype.hasOwnProperty.call(JOBS, id) ? JOBS[id] : null;
     if(!c && id.length >= 8){
       var hits = Object.keys(JOBS).filter(function(k){ return k.indexOf(id) === 0; });
       if(hits.length === 1) c = JOBS[hits[0]];
     }
-    if(!c){ msg("この求人票は現在準備中です", "公開までしばらくお待ちください。お急ぎの場合は、担当のアドバイザーまでご連絡ください。"); return; }
-    host.innerHTML = "";
-    host.appendChild(renderJobSheet(c, { updatedAt:c.jobUpdatedAt }));
-    host.appendChild(jobMk("div", "pg-foot", "就活の名人"));
-    document.title = (c.job && c.job.corpName ? c.job.corpName : c.name) + " 求人票";
-    window.scrollTo(0, 0);
+    if(!c){
+      // ページ内のタブ（#features など）は求人の切り替えではない
+      if(current && document.getElementById(id)) return;
+      msg("clock", "この求人票は現在準備中です", "公開までしばらくお待ちください。お急ぎの場合は、担当のアドバイザーまでご連絡ください。"); return;
+    }
+    render(c);
+    onScroll();
   }
   window.addEventListener("hashchange", show);
-  if(JOBS_URL){
-    msg("読み込み中です…", "しばらくお待ちください。");
-    fetch(JOBS_URL + "?t=" + Date.now(), { cache:"no-store" }).then(function(r){ if(!r.ok) throw new Error("http " + r.status); return r.json(); })
-      .then(function(d){ JOBS = d || {}; show(); })
-      .catch(function(){ msg("読み込めませんでした", "時間をおいて、もう一度お開きください。"); });
-  } else {
-    show();
-  }
+  msg("", "", "", true);
+  fetch(JOBS_URL + "?t=" + Date.now(), { cache:"no-store" })
+    .then(function(r){ if(!r.ok) throw new Error("http " + r.status); return r.json(); })
+    .then(function(d){ JOBS = d || {}; show(); })
+    .catch(function(){ msg("clock", "読み込めませんでした", "時間をおいて、もう一度お開きください。"); });
 })();
 </script>
-
-</body></html>
+</body>
+</html>
