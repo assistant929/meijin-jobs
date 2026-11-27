@@ -565,6 +565,9 @@
       ["従業員数", g("employees")], ["資本金", g("capital")], ["売上高", g("sales")], ["ホームページ", g("hp"), "url"]]);
     if(d7){ s7.appendChild(d7); secs.push(s7); }
 
+    // 条件面（給与・休日・待遇）は、おすすめポイントより上に出す
+    var payIdx = secs.indexOf(s3);
+    if(payIdx > 0){ secs.splice(payIdx, 1); secs.unshift(s3); }
     secs.forEach(function(s){ host.appendChild(s); });
     var foot = mk("footer", "foot");
     foot.appendChild(mk("b", "", "就活の名人"));
