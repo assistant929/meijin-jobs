@@ -1,0 +1,20 @@
+{
+ "8b1d877e-50b5-4f70-817c-0bddc34053ea": {
+  "hero": "img/co/8b1d877e/hero.webp",
+  "gallery": [
+   "img/co/8b1d877e/1.webp",
+   "img/co/8b1d877e/2.webp",
+   "img/co/8b1d877e/3.webp"
+  ],
+  "source": "https://www.takatsudo-denshi.com/"
+ },
+ "45c374b2-4027-4d5a-b517-7af84734057e": {
+  "hero": "img/co/45c374b2/hero.webp",
+  "gallery": [
+   "img/co/45c374b2/1.webp",
+   "img/co/45c374b2/2.webp",
+   "img/co/45c374b2/3.webp"
+  ],
+  "source": "https://www.tracom.co.jp/recruit/"
+ }
+}
