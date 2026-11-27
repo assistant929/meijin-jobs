@@ -14,9 +14,10 @@
     --teal:#20a39b; --teal-dark:#18867f; --teal-weak:#e7f5f4; --teal-line:#bfe4e1;
     --line-c:#06c755; --border:#e2e6ea; --soft:#f7f9fa; --gold:#c98a12; --gold-weak:#fff6e2;
     --radius:14px; --shadow:0 1px 6px rgba(30,50,60,.06);
-    --head-h:52px;
+    --head-h:0px;
   }
   *{box-sizing:border-box;}
+  [hidden]{display:none!important;}
   html{scroll-behavior:smooth;}
   body{margin:0;background:var(--bg);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans CJK JP","Yu Gothic UI",Meiryo,sans-serif;
@@ -25,14 +26,9 @@
   a{color:var(--teal-dark);}
 
   /* ヘッダー */
-  .top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--border);}
-  .top-in{max-width:760px;margin:0 auto;height:var(--head-h);padding:0 16px;display:flex;align-items:center;gap:10px;}
-  .top img{width:30px;height:30px;border-radius:50%;flex:none;}
-  .top b{font-size:15px;color:var(--teal-dark);font-weight:700;letter-spacing:.02em;white-space:nowrap;}
-  .top .co{flex:1;min-width:0;font-size:13px;color:var(--sub);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;}
-  .top.scrolled .co{opacity:1;transform:none;}
   .icon-btn{border:1px solid var(--border);background:#fff;border-radius:999px;height:34px;padding:0 12px;display:flex;align-items:center;gap:5px;color:var(--sub);font-size:12.5px;font-weight:700;cursor:pointer;flex:none;}
   .icon-btn svg{width:15px;height:15px;}
+  .hero-band .icon-btn{position:absolute;top:16px;right:16px;z-index:1;background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.4);color:#fff;}
 
   /* 章のタブ */
   .tabs{position:sticky;top:var(--head-h);z-index:19;background:rgba(245,247,248,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
@@ -186,14 +182,9 @@
 </style>
 </head>
 <body>
-<header class="top" id="top"><div class="top-in">
-  <img src="img/avatar.webp" alt="" width="30" height="30" onerror="this.src='img/avatar.jpg'">
-  <b>就活の名人</b>
-  <span class="co" id="topCo"></span>
-  <button class="icon-btn" id="shareBtn" type="button" hidden>
+<button class="icon-btn" id="shareBtn" type="button" hidden>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>共有
   </button>
-</div></header>
 <nav class="tabs" id="tabs" hidden><div class="tabs-in" id="tabsIn"></div></nav>
 <main class="wrap" id="pg"></main>
 
@@ -447,6 +438,7 @@
     var chips = mk("div", "chips");
     [m.industry].concat(m.tags).filter(Boolean).forEach(function(t){ chips.appendChild(mk("span", "chip", t)); });
     if(chips.childNodes.length) band.appendChild(chips);
+    if(navigator.share) band.appendChild(shareBtn);
     hero.appendChild(band);
 
     var body = mk("div", "hero-body");
@@ -555,7 +547,6 @@
     tabs.hidden = secs.length < 2;
     watchSections(secs);
 
-    document.getElementById("topCo").textContent = m.name;
     document.title = m.name + (m.jobTitle ? "｜" + m.jobTitle : "") + "｜就活の名人";
     current = m;
     cta.hidden = false; document.body.classList.add("has-cta");
@@ -583,10 +574,8 @@
   }
 
   /* ヘッダーに社名、下部ボタンの出し入れ */
-  var topEl = document.getElementById("top");
   function onScroll(){
     var y = window.scrollY || 0;
-    topEl.classList.toggle("scrolled", y > 140);
     cta.classList.toggle("show", y > 60 || document.documentElement.scrollHeight <= window.innerHeight + 80);
   }
   window.addEventListener("scroll", onScroll, { passive:true });
