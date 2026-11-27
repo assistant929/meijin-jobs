@@ -43,6 +43,21 @@
   /* ヒーロー */
   .card.hero{padding:0;overflow:hidden;}
   .hero-band{background:linear-gradient(135deg,#20a39b 0%,#2bb7a4 55%,#5cc9b5 100%);color:#fff;padding:22px 20px 20px;position:relative;}
+  .hero-band.photo{background-color:#1d2a30;background-position:center;background-size:cover;min-height:270px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;padding-top:60px;}
+  .hero-band.photo::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.12) 35%,rgba(8,28,32,.82) 100%);}
+  .hero-band.photo::after{display:none;}
+  .hero-band.photo > :not(.icon-btn){position:relative;}
+  .hero-band.photo h1,.hero-band.photo .job{text-shadow:0 1px 10px rgba(0,0,0,.35);}
+  .hero-band.photo .eyebrow{background:rgba(32,163,155,.92);}
+  .gallery{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 0 6px;padding-bottom:2px;scrollbar-width:none;}
+  .gallery::-webkit-scrollbar{display:none;}
+  .gallery button{flex:0 0 44%;aspect-ratio:3/2;border:0;padding:0;border-radius:10px;overflow:hidden;scroll-snap-align:start;cursor:zoom-in;background:var(--soft);}
+  .gallery img{width:100%;height:100%;object-fit:cover;display:block;}
+  @media (min-width:600px){ .gallery button{flex-basis:31.5%;} }
+  .credit{font-size:11px;color:var(--mute);margin:0 0 14px;}
+  .lbx{position:fixed;inset:0;z-index:60;background:rgba(10,15,20,.88);display:none;align-items:center;justify-content:center;padding:16px;cursor:zoom-out;}
+  .lbx.open{display:flex;}
+  .lbx img{max-width:100%;max-height:100%;border-radius:10px;}
   .hero-band::after{content:"";position:absolute;right:-40px;top:-40px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.09);}
   .eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.08em;background:rgba(255,255,255,.2);border-radius:999px;padding:2px 10px;}
   .hero h1{margin:10px 0 4px;font-size:25px;line-height:1.4;font-weight:800;letter-spacing:.01em;text-wrap:balance;overflow-wrap:anywhere;position:relative;}
@@ -218,6 +233,11 @@
 (function(){
   var JOBS = {};
   var JOBS_URL = "jobs.json";
+  var PHOTOS = {};   // photos.json：企業ID → { hero, gallery[] }。jobs.json（管理画面から書き出し）とは別に手で管理する
+  var lbx = document.createElement("div"); lbx.className = "lbx";
+  var lbxImg = document.createElement("img"); lbxImg.alt = ""; lbx.appendChild(lbxImg);
+  lbx.addEventListener("click", function(){ lbx.classList.remove("open"); });
+  document.body.appendChild(lbx);
   /* 学生向けの公開ページ専用の表示。
      データ（jobs.json）の形は、予約システムの企業マスタ（admin-hearing）が書き出すものと同じ。 */
 
@@ -365,12 +385,21 @@
     var locShort = (c.locations || []).join("・") || locs.split("\n")[0];
     var transfer = [c.transfer, g("transferNote")].filter(Boolean).join("\n");
     var hasSalary = c.salary != null && c.salary !== "";
+    var salaryNum = hasSalary ? Number(c.salary) : NaN;
+    // 初任給は総支給で出す。マスタに基本給だけが入っている会社は、給与（詳細）の「月給」「初任給」の額を使う
+    (function(){
+      var t = g("salaryDetail").replace(/[０-９]/g, function(d){ return String.fromCharCode(d.charCodeAt(0) - 0xFEE0); });
+      function yen(re){ var m = t.match(re); return m ? Number(m[1].replace(/[,，]/g, "")) / 10000 : NaN; }
+      var base = yen(/基本給[^0-9]{0,8}([0-9][0-9,，]{4,})\s*円/);
+      var total = yen(/(?:月給|初任給)[^0-9]{0,8}([0-9][0-9,，]{4,})\s*円/);
+      if(isFinite(total) && isFinite(base) && total > base && (!isFinite(salaryNum) || Math.abs(salaryNum - base) < 0.1)){ salaryNum = total; hasSalary = true; }
+    })();
     var hasHol = c.holidays != null && c.holidays !== "";
     var holidayHead = hasHol ? ("年間休日" + c.holidays + "日" + (c.holidayType ? "（" + c.holidayType + "）" : "")) : (c.holidayType || "");
     return {
       name:name, industry:industry, jobTitle:g("jobTitle"),
       tags:[].concat(c.roles || []).concat(c.size ? [c.size] : []).filter(Boolean),
-      salary:hasSalary ? man(c.salary) : "", salaryNote:/固定残業|みなし残業/.test(g("salaryDetail")) ? "固定残業代を含みます（内訳は「給与・休日」へ）" : "",
+      salary:hasSalary ? man(Math.floor(salaryNum * 10) / 10) : "", salaryNote:/固定残業|みなし残業/.test(g("salaryDetail")) ? "固定残業代を含みます（内訳は「給与・休日」へ）" : "",
       holidays:hasHol ? String(c.holidays) : "", locShort:locShort, transfer:txt(c.transfer), headcount:g("headcount"), employmentType:g("employmentType"),
       g:g, locs:locs, transferAll:transfer, holidayAll:[holidayHead, g("holidaysDetail")].filter(Boolean).join("\n")
     };
@@ -430,7 +459,9 @@
 
     /* ヒーロー */
     var hero = mk("section", "card hero");
-    var band = mk("div", "hero-band");
+    var ph = PHOTOS[c.id] || null;
+    var band = mk("div", "hero-band" + (ph && ph.hero ? " photo" : ""));
+    if(ph && ph.hero) band.style.backgroundImage = 'url("' + encodeURI(ph.hero) + '")';
     var eb = mk("span", "eyebrow"); eb.innerHTML = ICONS.star.replace("<svg", '<svg width="12" height="12"'); eb.appendChild(document.createTextNode("就活の名人 紹介求人"));
     band.appendChild(eb);
     band.appendChild(mk("h1", "", m.name));
@@ -442,10 +473,22 @@
     hero.appendChild(band);
 
     var body = mk("div", "hero-body");
+    if(ph && ph.gallery && ph.gallery.length){
+      var gal = mk("div", "gallery");
+      ph.gallery.forEach(function(src){
+        var b = mk("button"); b.type = "button"; b.setAttribute("aria-label", "写真を拡大");
+        var im = mk("img"); im.src = src; im.alt = ""; im.loading = "lazy";
+        b.appendChild(im);
+        b.addEventListener("click", function(){ lbxImg.src = src; lbx.classList.add("open"); });
+        gal.appendChild(b);
+      });
+      body.appendChild(gal);
+    }
+    if(ph && (ph.hero || (ph.gallery && ph.gallery.length))) body.appendChild(mk("div", "credit", "写真：" + m.name + " 公式サイトより"));
     var facts = mk("div", "facts");
     if(m.salary){
       var big = mk("div", "fact big");
-      big.appendChild(mk("div", "fact-l", "初任給（月給）"));
+      big.appendChild(mk("div", "fact-l", "初任給（月給・総支給）"));
       var v = mk("div", "fact-v", m.salary); v.appendChild(mk("small", "", "万円")); big.appendChild(v);
       if(m.salaryNote) big.appendChild(mk("div", "fact-n", m.salaryNote));
       facts.appendChild(big);
@@ -496,7 +539,7 @@
 
     /* 給与・休日・待遇 */
     var s3 = section("pay", "給与・休日・待遇", "yen"); s3._tab = "給与・休日";
-    var d3 = dl([["初任給", m.salary ? m.salary + "万円" : ""], ["給与の内訳", g("salaryDetail"), "rich"], ["賞与", g("bonus")], ["昇給", g("raise")], ["就業時間", g("hours"), "rich"]]);
+    var d3 = dl([["初任給（総支給）", m.salary ? m.salary + "万円" : ""], ["給与の内訳", g("salaryDetail"), "rich"], ["賞与", g("bonus")], ["昇給", g("raise")], ["就業時間", g("hours"), "rich"]]);
     if(d3){ subT(s3, "給与・勤務時間"); s3.appendChild(d3); }
     if(m.holidayAll){ subT(s3, "休日・休暇"); s3.appendChild(rich(m.holidayAll, true)); }
     if(g("benefits")){ subT(s3, "福利厚生"); s3.appendChild(rich(g("benefits"), true)); }
@@ -531,6 +574,9 @@
       ["従業員数", g("employees")], ["資本金", g("capital")], ["売上高", g("sales")], ["ホームページ", g("hp"), "url"]]);
     if(d7){ s7.appendChild(d7); secs.push(s7); }
 
+    // 条件面（給与・休日・待遇）は、おすすめポイントより上に出す
+    var payIdx = secs.indexOf(s3);
+    if(payIdx > 0){ secs.splice(payIdx, 1); secs.unshift(s3); }
     secs.forEach(function(s){ host.appendChild(s); });
     var foot = mk("footer", "foot");
     foot.appendChild(mk("b", "", "就活の名人"));
@@ -642,9 +688,11 @@
   }
   window.addEventListener("hashchange", show);
   msg("", "", "", true);
+  var photosReq = fetch("photos.json?t=" + Date.now(), { cache:"no-store" })
+    .then(function(r){ return r.ok ? r.json() : {}; }).catch(function(){ return {}; });
   fetch(JOBS_URL + "?t=" + Date.now(), { cache:"no-store" })
     .then(function(r){ if(!r.ok) throw new Error("http " + r.status); return r.json(); })
-    .then(function(d){ JOBS = d || {}; show(); })
+    .then(function(d){ return photosReq.then(function(p){ PHOTOS = p || {}; JOBS = d || {}; show(); }); })
     .catch(function(){ msg("clock", "読み込めませんでした", "時間をおいて、もう一度お開きください。"); });
 })();
 </script>
